@@ -11,8 +11,10 @@
 // Wheel 1
 int m1 = 255; // Signal to Wheel 1
 
+int calibration = 2;
+
 // Wheel 2
-int m2 = 255; // Signal to Wheel 2
+int m2 = 255 - calibration; // Signal to Wheel 2
 
 void setup() {
   Serial.begin(9600);
@@ -40,7 +42,7 @@ void loop(){
   digitalWrite(I3, LOW);
   digitalWrite(I4, HIGH);
   analogWrite(E1, 248); 
-  analogWrite(E2, 248); 
+  analogWrite(E2, 248 - calibration); 
 
   long duration, distance;
 
