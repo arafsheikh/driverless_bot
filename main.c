@@ -14,6 +14,7 @@
 int m1 = 255; // Signal to Wheel 1
 
 int calibration = 2;
+int error_prev;
 
 // Wheel 2
 int m2 = 255 - calibration; // Signal to Wheel 2
@@ -47,7 +48,7 @@ void setup() {
   digitalWrite(I4, HIGH);
 }
 
-void loop(){
+void loop() {
 
   digitalWrite(I1, HIGH);
   digitalWrite(I2, LOW);
@@ -71,17 +72,23 @@ void loop(){
     Serial.print(distance);
     Serial.println(" cm");
   }
-  
+
   int kp = 275/60;
+  int kd = 5 * kp;
+  int error;
+ 
+  int error_d = 0;
   
   error = distance - 29;
+  error_d = error - error_prev;
+  //if (error > -1 && error < 4) error = error_d = 0;
   
-  analogWrite(E1, kp * error); // Run in m1 Speed
-  analogWrite(E2, (kp * error) - calibration); // Run in m2 speed
+  analogWrite(E1, kp * error + kd * error_d ); // Run in m1 Speed
+  analogWrite(E2, (kp * error + kd * error_d ) - calibration); // Run in m2 speed
   if(error > 60 || error < 30)
   {
-    analogWrite(E1, 255);
-    analogWrite(E2, 255 - calibration);
+    analogWrite(E1,255);
+    analogWrite(E2,255 - calibration);
   }
   if ((error > -3 && error < 4)) {
     analogWrite(E1, 0);
@@ -89,14 +96,15 @@ void loop(){
   }
   if(error < 0 ||  distance <= 0 )
   {
-  digitalWrite(I1, LOW);
-  digitalWrite(I2, HIGH);
-  digitalWrite(I3, HIGH);
-  digitalWrite(I4, LOW);
-  analogWrite(E1, kp * error);
-  analogWrite(E2, (kp * error) - calibration);
+    digitalWrite(I1, LOW);
+    digitalWrite(I2, HIGH);
+    digitalWrite(I3, HIGH);
+    digitalWrite(I4, LOW);
+    analogWrite(E1, kp * error + kd * error_d );
+    analogWrite(E2, (kp * error + kd * error_d) - calibration);
   }
+  error_prev = error;
   delay(100);
 
-  debug(2, error, kp);
+  debug(2, error, error_d);
 }
