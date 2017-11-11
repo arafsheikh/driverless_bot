@@ -1,3 +1,5 @@
+# include <stdarg.h>
+
 # define E1 3 // Enable Pin for motor 1
 # define E2 5 // Enable Pin for motor 2
 
@@ -15,6 +17,16 @@ int calibration = 2;
 
 // Wheel 2
 int m2 = 255 - calibration; // Signal to Wheel 2
+
+void debug(int num, ...) {
+  va_list valist;
+  va_start(valist, num);
+  int i;
+  for (i=0; i < num; i++) {
+    Serial.println(va_arg(valist, int));
+  }
+  va_end(valist);
+}
 
 void setup() {
   Serial.begin(9600);
@@ -60,4 +72,6 @@ void loop(){
     Serial.println(" cm");
   }
   delay(100);
+  
+  debug(2, duration, distance);
 }
