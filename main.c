@@ -71,7 +71,32 @@ void loop(){
     Serial.print(distance);
     Serial.println(" cm");
   }
-  delay(100);
   
-  debug(2, duration, distance);
+  int kp = 275/60;
+  
+  error = distance - 29;
+  
+  analogWrite(E1, kp * error); // Run in m1 Speed
+  analogWrite(E2, (kp * error) - calibration); // Run in m2 speed
+  if(error > 60 || error < 30)
+  {
+    analogWrite(E1, 255);
+    analogWrite(E2, 255 - calibration);
+  }
+  if ((error > -3 && error < 4)) {
+    analogWrite(E1, 0);
+    analogWrite(E2, 0);
+  }
+  if(error < 0 ||  distance <= 0 )
+  {
+  digitalWrite(I1, LOW);
+  digitalWrite(I2, HIGH);
+  digitalWrite(I3, HIGH);
+  digitalWrite(I4, LOW);
+  analogWrite(E1, kp * error);
+  analogWrite(E2, (kp * error) - calibration);
+  }
+  delay(100);
+
+  debug(2, error, kp);
 }
